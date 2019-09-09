@@ -10,3 +10,6 @@ You need to set up the following environment variables for it to work:
 * `PREFIX` for the prefix that must be removed from your package name,
   e.g. `golang.org/x/` for `golang.org/x/image`, and
 * `VCS` for the type of VCS you are using, e.g. `git`.
+
+Additionally, the version under `gcp/` will bind to the port passed in
+the `PORT` environment variable, or 8080 if that variable is not set.
