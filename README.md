@@ -11,5 +11,9 @@ You need to set up the following environment variables for it to work:
   e.g. `golang.org/x/` for `golang.org/x/image`, and
 * `VCS` for the type of VCS you are using, e.g. `git`.
 
-Additionally, the version under `gcp/` will bind to the port passed in
-the `PORT` environment variable, or 8080 if that variable is not set.
+Additionally, the version under `gcp/` will use:
+
+* `ADDR` for the address to listen on, defaulting to every address, and
+* `PORT` for the port to listen on, defaulting to 8080.
+
+See https://golang.org/pkg/net/#Dial for details of the address format.

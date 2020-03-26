@@ -31,5 +31,5 @@ func main() {
 		port = "8080"
 	}
 	http.HandleFunc("/", redirect)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Fatal(http.ListenAndServe(os.Getenv("ADDR")+":"+port, nil))
 }
