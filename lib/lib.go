@@ -12,15 +12,16 @@ import (
 )
 
 func GetBody(pkg string) string {
-	dest := strings.TrimRight(os.Getenv("DEST"), "/") + "/" + getRepo(pkg)
+	dest := GetDest(os.Getenv("PREFIX"), os.Getenv("DEST"), pkg)
 	return fmt.Sprintf(`<!doctype html>
 <meta name="go-import" content="%s %s %s">
 <title>go-import-redirect</title>
 `, pkg, os.Getenv("VCS"), dest)
 }
 
-func getRepo(pkg string) string {
-	prefix := strings.TrimRight(os.Getenv("PREFIX"), "/")
-	path := strings.TrimLeft(strings.TrimPrefix(pkg, prefix), "/")
-	return strings.Split(path, "/")[0]
+func GetDest(srcPrefix, destPrefix, pkg string) string {
+	srcPrefix = strings.TrimRight(srcPrefix, "/")
+	destPrefix = strings.TrimRight(destPrefix, "/")
+	path := strings.TrimLeft(strings.TrimPrefix(pkg, srcPrefix), "/")
+	return destPrefix + "/" + strings.Split(path, "/")[0]
 }
