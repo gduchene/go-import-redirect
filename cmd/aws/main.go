@@ -11,7 +11,7 @@ import (
 	"context"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"go.awhk.org/go-import-redirect/lib"
+	"go.awhk.org/go-import-redirect/internal"
 	"net/http"
 	"path"
 )
@@ -20,7 +20,7 @@ func redirect(ctx context.Context, req events.APIGatewayProxyRequest) (events.AP
 	var (
 		pkg  = path.Join(req.Headers["Host"], req.Path)
 		resp = events.APIGatewayProxyResponse{
-			Body:    lib.GetBody(pkg),
+			Body:    internal.GetBody(pkg),
 			Headers: map[string]string{"Content-Type": "text/html; charset=utf-8"},
 		}
 	)

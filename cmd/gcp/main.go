@@ -6,7 +6,7 @@
 package main
 
 import (
-	"go.awhk.org/go-import-redirect/lib"
+	"go.awhk.org/go-import-redirect/internal"
 	"log"
 	"net/http"
 	"os"
@@ -22,7 +22,7 @@ func redirect(resp http.ResponseWriter, req *http.Request) {
 		resp.Header()["Location"] = []string{"https://godoc.org/" + pkg}
 		resp.WriteHeader(http.StatusFound)
 	}
-	resp.Write([]byte(lib.GetBody(pkg)))
+	resp.Write([]byte(internal.GetBody(pkg)))
 }
 
 func main() {
