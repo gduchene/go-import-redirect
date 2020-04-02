@@ -14,6 +14,12 @@ import (
 )
 
 func redirect(resp http.ResponseWriter, req *http.Request) {
+	if req.Method != "GET" {
+		resp.Header()["Allow"] = []string{"GET"}
+		resp.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
 	pkg := path.Join(req.Host, req.URL.Path)
 	resp.Header()["Content-Type"] = []string{"text/html; charset=utf-8"}
 	if v, ok := req.URL.Query()["go-get"]; ok && len(v) > 0 && v[0] == "1" {
