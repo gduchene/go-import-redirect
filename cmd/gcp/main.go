@@ -60,11 +60,10 @@ func main() {
 				log.Fatalln("os.Chmod:", err)
 			}
 		} else {
-			port := os.Getenv("PORT")
-			if port == "" {
-				port = "8080"
+			if addr == "" {
+				addr = ":8080"
 			}
-			if l, err = net.Listen("tcp", os.Getenv("ADDR")+":"+port); err != nil {
+			if l, err = net.Listen("tcp", addr); err != nil {
 				log.Fatalln("net.Listen:", err)
 			}
 		}
