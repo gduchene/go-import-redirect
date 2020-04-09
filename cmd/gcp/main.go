@@ -8,6 +8,7 @@ package main
 import (
 	"context"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -45,12 +46,29 @@ func main() {
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
-		port := os.Getenv("PORT")
-		if port == "" {
-			port = "8080"
+		var (
+			addr = os.Getenv("ADDR")
+			l    net.Listener
+			err  error
+		)
+		if addr != "" && addr[0] == '/' {
+			if l, err = net.Listen("unix", addr); err != nil {
+				log.Fatalln("net.Listen:", err)
+			}
+			// We do not do any authorization anyway, so 0666 makes sense here.
+			if err = os.Chmod(addr, 0666); err != nil {
+				log.Fatalln("os.Chmod:", err)
+			}
+		} else {
+			port := os.Getenv("PORT")
+			if port == "" {
+				port = "8080"
+			}
+			if l, err = net.Listen("tcp", os.Getenv("ADDR")+":"+port); err != nil {
+				log.Fatalln("net.Listen:", err)
+			}
 		}
-		srv.Addr = os.Getenv("ADDR") + ":" + port
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err = srv.Serve(l); err != nil && err != http.ErrServerClosed {
 			log.Fatalln("server.ListenAndServe:", err)
 		}
 	}()

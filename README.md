@@ -17,3 +17,7 @@ Additionally, the version under `gcp/` will use:
 * `PORT` for the port to listen on, defaulting to 8080.
 
 See https://golang.org/pkg/net/#Dial for details of the address format.
+
+If `ADDR` is set and starts with `/`, go-import-redirect will treat it
+as the path of a UNIX socket to create and listen on. `PORT` is also
+ignored.
