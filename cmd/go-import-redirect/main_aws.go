@@ -3,17 +3,18 @@
 // Use of this source code is governed by the ISC license that can be
 // found in the LICENSE file.
 
-// +build linux
+// +build aws,linux
 
 package main
 
 import (
 	"context"
+	"net/http"
+	"path"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"go.awhk.org/go-import-redirect/internal"
-	"net/http"
-	"path"
 )
 
 func redirect(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
