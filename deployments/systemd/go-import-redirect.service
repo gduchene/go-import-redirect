@@ -4,7 +4,7 @@
 # the LICENSE file.
 
 [Install]
-  WantedBy=default.target
+  WantedBy=multi-user.target
 
 [Service]
   Environment=ADDR=%t/go-import-redirect/socket
