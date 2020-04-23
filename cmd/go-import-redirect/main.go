@@ -15,8 +15,9 @@ import (
 	"os"
 	"os/signal"
 	"path"
-	"syscall"
 	"time"
+
+	"golang.org/x/sys/unix"
 
 	"go.awhk.org/go-import-redirect/internal"
 )
@@ -45,7 +46,7 @@ func main() {
 	srv := http.Server{Handler: mux}
 
 	done := make(chan os.Signal, 1)
-	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(done, os.Interrupt, unix.SIGTERM)
 
 	go func() {
 		var (
