@@ -9,6 +9,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -37,7 +38,9 @@ func redirect(resp http.ResponseWriter, req *http.Request) {
 		resp.Header().Set("Location", "https://pkg.go.dev/"+pkg)
 		resp.WriteHeader(http.StatusFound)
 	}
-	resp.Write([]byte(internal.GetBody(pkg)))
+	if _, err := fmt.Fprint(resp, internal.GetBody(pkg)); err != nil {
+		log.Println("fmt.Fprint:", err)
+	}
 }
 
 func main() {
