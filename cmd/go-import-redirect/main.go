@@ -23,18 +23,18 @@ import (
 )
 
 func redirect(resp http.ResponseWriter, req *http.Request) {
-	if req.Method != "GET" {
-		resp.Header()["Allow"] = []string{"GET"}
+	if req.Method != http.MethodGet {
+		resp.Header().Set("Allow", http.MethodGet)
 		resp.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
 	pkg := path.Join(req.Host, req.URL.Path)
-	resp.Header()["Content-Type"] = []string{"text/html; charset=utf-8"}
+	resp.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if v, ok := req.URL.Query()["go-get"]; ok && len(v) > 0 && v[0] == "1" {
 		resp.WriteHeader(http.StatusOK)
 	} else {
-		resp.Header()["Location"] = []string{"https://pkg.go.dev/" + pkg}
+		resp.Header().Set("Location", "https://pkg.go.dev/"+pkg)
 		resp.WriteHeader(http.StatusFound)
 	}
 	resp.Write([]byte(internal.GetBody(pkg)))
