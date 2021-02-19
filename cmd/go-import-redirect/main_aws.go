@@ -14,6 +14,7 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+
 	"go.awhk.org/go-import-redirect/internal"
 )
 
@@ -28,7 +29,7 @@ func redirect(ctx context.Context, req events.APIGatewayProxyRequest) (events.AP
 	if v, ok := req.QueryStringParameters["go-get"]; ok && v == "1" {
 		resp.StatusCode = http.StatusOK
 	} else {
-		resp.Headers["Location"] = "https://godoc.org/" + pkg
+		resp.Headers["Location"] = "https://pkg.go.dev/" + pkg
 		resp.StatusCode = http.StatusFound
 	}
 	return resp, nil
