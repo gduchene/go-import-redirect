@@ -32,7 +32,7 @@ func redirect(resp http.ResponseWriter, req *http.Request) {
 
 	pkg := path.Join(req.Host, req.URL.Path)
 	resp.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if v, ok := req.URL.Query()["go-get"]; ok && len(v) > 0 && v[0] == "1" {
+	if req.URL.Query().Get("go-get") == "1" {
 		resp.WriteHeader(http.StatusOK)
 	} else {
 		resp.Header().Set("Location", "https://pkg.go.dev/"+pkg)
