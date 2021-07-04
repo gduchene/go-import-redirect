@@ -3,12 +3,12 @@
 # Use of this file is governed by the ISC license that can be found in
 # the LICENSE file.
 
-[Install]
-  WantedBy=multi-user.target
+[Unit]
+Description=go-import-redirect
 
 [Service]
-  ExecStart=go-import-redirect
-  DynamicUser=true
+ExecStart=go-import-redirect
+DynamicUser=true
 
-[Unit]
-  Description=go-import-redirect
+[Install]
+WantedBy=multi-user.target
