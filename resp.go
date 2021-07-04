@@ -3,7 +3,7 @@
 // Use of this source code is governed by the ISC license that can be
 // found in the LICENSE file.
 
-package internal
+package main
 
 import (
 	"fmt"

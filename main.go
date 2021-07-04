@@ -19,8 +19,6 @@ import (
 	"time"
 
 	"golang.org/x/sys/unix"
-
-	"go.awhk.org/go-import-redirect/internal"
 )
 
 func redirect(resp http.ResponseWriter, req *http.Request) {
@@ -38,7 +36,7 @@ func redirect(resp http.ResponseWriter, req *http.Request) {
 		resp.Header().Set("Location", "https://pkg.go.dev/"+pkg)
 		resp.WriteHeader(http.StatusFound)
 	}
-	if _, err := fmt.Fprint(resp, internal.GetBody(pkg)); err != nil {
+	if _, err := fmt.Fprint(resp, GetBody(pkg)); err != nil {
 		log.Println("fmt.Fprint:", err)
 	}
 }

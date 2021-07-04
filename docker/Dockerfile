@@ -2,7 +2,7 @@ FROM golang:1.15
 WORKDIR /root
 COPY . ./
 ENV CGO_ENABLED=0
-RUN go build ./cmd/go-import-redirect
+RUN go build
 
 FROM scratch
 COPY --from=0 /root/go-import-redirect /go-import-redirect
