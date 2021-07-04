@@ -19,6 +19,8 @@ import (
 	"time"
 
 	"golang.org/x/sys/unix"
+
+	"go.awhk.org/gosdd"
 )
 
 func redirect(resp http.ResponseWriter, req *http.Request) {
@@ -50,28 +52,14 @@ func main() {
 	signal.Notify(done, os.Interrupt, unix.SIGTERM)
 
 	go func() {
-		var (
-			addr = os.Getenv("ADDR")
-			l    net.Listener
-			err  error
-		)
-		if addr != "" && addr[0] == '/' {
-			if l, err = net.Listen("unix", addr); err != nil {
-				log.Fatalln("net.Listen:", err)
-			}
-			// We do not do any authorization anyway, so 0666 makes sense here.
-			if err = os.Chmod(addr, 0666); err != nil {
-				log.Fatalln("os.Chmod:", err)
-			}
-		} else {
-			if addr == "" {
-				addr = ":8080"
-			}
-			if l, err = net.Listen("tcp", addr); err != nil {
-				log.Fatalln("net.Listen:", err)
-			}
+		ln, err := listenSD()
+		if err != nil {
+			log.Fatalln("listenSD:", err)
 		}
-		if err = srv.Serve(l); err != nil && err != http.ErrServerClosed {
+		if ln == nil {
+			ln = listenEnv()
+		}
+		if err := srv.Serve(ln); err != nil && err != http.ErrServerClosed {
 			log.Fatalln("server.ListenAndServe:", err)
 		}
 	}()
@@ -82,4 +70,41 @@ func main() {
 	if err := srv.Shutdown(ctx); err != nil && err != http.ErrServerClosed {
 		log.Fatalln("server.Shutdown:", err)
 	}
+}
+
+func listenEnv() net.Listener {
+	addr := os.Getenv("ADDR")
+	if addr == "" || addr[0] != '/' {
+		if addr == "" {
+			addr = ":8080"
+		}
+		ln, err := net.Listen("tcp", ":8080")
+		if err != nil {
+			log.Fatalln("net.Listen:", err)
+		}
+		return ln
+	}
+	ln, err := net.Listen("unix", addr)
+	if err != nil {
+		log.Fatalln("net.Listen:", err)
+	}
+	// We do not do any authorization anyway, so 0666 makes sense here.
+	if err = os.Chmod(addr, 0666); err != nil {
+		log.Fatalln("os.Chmod:", err)
+	}
+	return ln
+}
+
+func listenSD() (net.Listener, error) {
+	fds, err := gosdd.SDListenFDs(true)
+	if err != nil {
+		if err == gosdd.ErrNoSDSupport {
+			return nil, nil
+		}
+		return nil, err
+	}
+	if len(fds) == 0 {
+		return nil, nil
+	}
+	return net.FileListener(fds[0])
 }

@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: © 2021 Grégoire Duchêne <gduchene@awhk.org>
+# SPDX-License-Identifier: ISC
+
+[Unit]
+Description=go-import-redirect Socket
+
+[Socket]
+ListenStream=%t/go-import-redirect
+
+[Install]
+WantedBy=sockets.target

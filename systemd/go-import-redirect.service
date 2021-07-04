@@ -7,10 +7,8 @@
   WantedBy=multi-user.target
 
 [Service]
-  Environment=ADDR=%t/go-import-redirect/socket
   ExecStart=go-import-redirect
   DynamicUser=true
-  RuntimeDirectory=go-import-redirect
 
 [Unit]
   Description=go-import-redirect
