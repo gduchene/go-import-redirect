@@ -1,7 +1,5 @@
-// Copyright (c) 2019, Grégoire Duchêne <gduchene@awhk.org>
-//
-// Use of this source code is governed by the ISC license that can be
-// found in the LICENSE file.
+// SPDX-FileCopyrightText: © 2019 Grégoire Duchêne <gduchene@awhk.org>
+// SPDX-License-Identifier: ISC
 
 package main
 
