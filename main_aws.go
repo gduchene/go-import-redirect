@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: © 2019 Grégoire Duchêne <gduchene@awhk.org>
 // SPDX-License-Identifier: ISC
 
-// +build aws,linux
+//go:build aws && linux
 
 package main
 
