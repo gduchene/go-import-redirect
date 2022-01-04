@@ -7,13 +7,12 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"flag"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
-	"path"
 	"time"
 
 	"golang.org/x/sys/unix"
@@ -21,41 +20,27 @@ import (
 	"go.awhk.org/gosdd"
 )
 
-func redirect(resp http.ResponseWriter, req *http.Request) {
-	if req.Method != http.MethodGet {
-		resp.Header().Set("Allow", http.MethodGet)
-		resp.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
-	pkg := path.Join(req.Host, req.URL.Path)
-	if req.URL.Query().Get("go-get") != "1" {
-		resp.Header().Set("Location", "https://pkg.go.dev/"+pkg)
-		resp.WriteHeader(http.StatusFound)
-		return
-	}
-	resp.Header().Set("Content-Type", "text/html; charset=utf-8")
-	resp.WriteHeader(http.StatusOK)
-	if _, err := fmt.Fprint(resp, GetBody(pkg)); err != nil {
-		log.Println("fmt.Fprint:", err)
-	}
-}
+var (
+	addr = flag.String("addr", "localhost:8080", "address to listen on")
+	from = flag.String("from", "", "package prefix to remove")
+	to   = flag.String("to", "", "repository prefix to add")
+	vcs  = flag.String("vcs", "git", "version control system to signal")
+)
 
 func main() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", redirect)
-	srv := http.Server{Handler: mux}
+	flag.Parse()
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, unix.SIGTERM)
 
+	srv := http.Server{Handler: &redirector{*from, *to, *vcs}}
 	go func() {
 		ln, err := listenSD()
 		if err != nil {
 			log.Fatalln("listenSD:", err)
 		}
 		if ln == nil {
-			ln = listenEnv()
+			ln = listenFlag()
 		}
 		if err := srv.Serve(ln); err != nil && err != http.ErrServerClosed {
 			log.Fatalln("server.ListenAndServe:", err)
@@ -70,19 +55,15 @@ func main() {
 	}
 }
 
-func listenEnv() net.Listener {
-	addr := os.Getenv("ADDR")
-	if addr == "" || addr[0] != '/' {
-		if addr == "" {
-			addr = ":8080"
-		}
-		ln, err := net.Listen("tcp", ":8080")
+func listenFlag() net.Listener {
+	if (*addr)[0] != '/' {
+		ln, err := net.Listen("tcp", *addr)
 		if err != nil {
 			log.Fatalln("net.Listen:", err)
 		}
 		return ln
 	}
-	ln, err := net.Listen("unix", addr)
+	ln, err := net.Listen("unix", *addr)
 	if err != nil {
 		log.Fatalln("net.Listen:", err)
 	}
