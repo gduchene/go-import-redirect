@@ -29,13 +29,13 @@ func redirect(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	pkg := path.Join(req.Host, req.URL.Path)
-	resp.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if req.URL.Query().Get("go-get") == "1" {
-		resp.WriteHeader(http.StatusOK)
-	} else {
+	if req.URL.Query().Get("go-get") != "1" {
 		resp.Header().Set("Location", "https://pkg.go.dev/"+pkg)
 		resp.WriteHeader(http.StatusFound)
+		return
 	}
+	resp.Header().Set("Content-Type", "text/html; charset=utf-8")
+	resp.WriteHeader(http.StatusOK)
 	if _, err := fmt.Fprint(resp, GetBody(pkg)); err != nil {
 		log.Println("fmt.Fprint:", err)
 	}
