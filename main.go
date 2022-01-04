@@ -87,8 +87,8 @@ func listenEnv() net.Listener {
 		log.Fatalln("net.Listen:", err)
 	}
 	// We do not do any authorization anyway, so 0666 makes sense here.
-	if err = os.Chmod(addr, 0666); err != nil {
-		log.Fatalln("os.Chmod:", err)
+	if err = os.Chmod(*addr, 0666); err != nil {
+		log.Println("Failed to set permissions on UNIX socket:", err)
 	}
 	return ln
 }
