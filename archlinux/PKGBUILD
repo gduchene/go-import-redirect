@@ -4,7 +4,7 @@
 # Maintainer: Grégoire Duchêne <gduchene@awhk.org>
 
 pkgname=go-import-redirect
-pkgver=0.2.0
+pkgver=0.3.0
 pkgrel=1
 arch=(x86_64)
 url=https://github.com/gduchene/go-import-redirect
