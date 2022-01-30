@@ -4,6 +4,7 @@
 package main
 
 import (
+	_ "embed"
 	"log"
 	"net/http"
 	"path"
@@ -11,10 +12,12 @@ import (
 	"text/template"
 )
 
-var body = template.Must(template.New("").Parse(`<!doctype html>
-<meta name="go-import" content="{{.Package}} {{.VCS}} {{.Repository}}">
-<title>go-import-redirect</title>
-`))
+var (
+	body = template.Must(template.New("").Parse(tmpl))
+
+	//go:embed resp.html
+	tmpl string
+)
 
 type bodyData struct{ Package, Repository, VCS string }
 
