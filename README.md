@@ -21,6 +21,10 @@ It is recommended to enable the companion systemd socket and customize
 it so systemd can start the service when needed and pass the socket to
 `go-import-redirect`.
 
+If you do not want to use socket activation, you must override the
+`IPAddressDeny` and `RestrictAddressFamilies` unit settings to
+appropriate values.
+
 Likewise, you must customize the service definition to pass the right
 flag values.
 
