@@ -8,7 +8,7 @@ import (
 	"log"
 	"net/http"
 	"path"
-	"strings"
+	"regexp"
 	"text/template"
 )
 
@@ -21,9 +21,11 @@ var (
 
 type bodyData struct{ Package, Repository, VCS string }
 
-type redirector struct{ from, to, vcs string }
-
-var _ http.Handler = &redirector{}
+type redirector struct {
+	re   *regexp.Regexp
+	repl string
+	vcs  string
+}
 
 func (h *redirector) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodGet {
@@ -38,17 +40,11 @@ func (h *redirector) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusFound)
 		return
 	}
-	dest := h.getRepo(pkg)
+
+	dest := h.re.ReplaceAllString(pkg, h.repl)
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	if err := body.Execute(w, bodyData{pkg, dest, h.vcs}); err != nil {
 		log.Println(err)
 	}
-}
-
-func (h *redirector) getRepo(pkg string) string {
-	from := strings.TrimRight(h.from, "/")
-	to := strings.TrimRight(h.to, "/")
-	path := strings.TrimLeft(strings.TrimPrefix(pkg, from), "/")
-	return to + "/" + strings.Split(path, "/")[0]
 }

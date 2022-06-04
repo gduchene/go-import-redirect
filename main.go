@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"regexp"
 	"time"
 
 	"golang.org/x/sys/unix"
@@ -33,7 +34,7 @@ func main() {
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, unix.SIGTERM)
 
-	srv := http.Server{Handler: &redirector{*from, *to, *vcs}}
+	srv := http.Server{Handler: &redirector{regexp.MustCompile(*from), *to, *vcs}}
 	go func() {
 		ln, err := listenSD()
 		if err != nil {

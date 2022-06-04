@@ -7,11 +7,12 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"regexp"
 	"testing"
 )
 
 func TestRedirector_ServeHTTP(t *testing.T) {
-	r := &redirector{"src.example.com/x", "https://example.com/git", "git"}
+	r := &redirector{regexp.MustCompile(`src\.example\.com/x`), "https://example.com/git", "git"}
 
 	t.Run("GoVisit", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "https://src.example.com/x/foo?go-get=1", nil)
@@ -55,26 +56,4 @@ func TestRedirector_ServeHTTP(t *testing.T) {
 			t.Errorf("expected %q, got %q", "https://pkg.go.dev/src.example.com/x/foo", hdr)
 		}
 	})
-}
-
-func TestRedirector_getRepo(t *testing.T) {
-	r := &redirector{"src.example.com/x/", "https://example.com/git/", "git"}
-	for _, tc := range []struct{ pkg, expected string }{
-		{"src.example.com/x/foo", "https://example.com/git/foo"},
-		{"src.example.com/x/foo/bar", "https://example.com/git/foo"},
-	} {
-		if actual := r.getRepo(tc.pkg); actual != tc.expected {
-			t.Errorf("expected %q, got %q", tc.expected, actual)
-		}
-	}
-
-	r = &redirector{"src.example.com/x", "https://example.com/git", "git"}
-	for _, tc := range []struct{ pkg, expected string }{
-		{"src.example.com/x/foo", "https://example.com/git/foo"},
-		{"src.example.com/x/foo/bar", "https://example.com/git/foo"},
-	} {
-		if actual := r.getRepo(tc.pkg); actual != tc.expected {
-			t.Errorf("expected %q, got %q", tc.expected, actual)
-		}
-	}
 }
