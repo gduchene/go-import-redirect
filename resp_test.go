@@ -14,6 +14,17 @@ import (
 func TestRedirector_ServeHTTP(t *testing.T) {
 	r := &redirector{regexp.MustCompile(`src\.example\.com/x`), "https://example.com/git", "git"}
 
+	t.Run("NotFound", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "https://example.com/foo", nil)
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		resp := w.Result()
+		if http.StatusNotFound != resp.StatusCode {
+			t.Errorf("expected %d, got %d", http.StatusNotFound, resp.StatusCode)
+		}
+	})
+
 	t.Run("GoVisit", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "https://src.example.com/x/foo?go-get=1", nil)
 		w := httptest.NewRecorder()

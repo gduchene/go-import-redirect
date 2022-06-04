@@ -35,6 +35,10 @@ func (h *redirector) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	pkg := path.Join(req.Host, req.URL.Path)
+	if !h.re.MatchString(pkg) {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 	if req.URL.Query().Get("go-get") != "1" {
 		w.Header().Set("Location", "https://pkg.go.dev/"+pkg)
 		w.WriteHeader(http.StatusFound)
