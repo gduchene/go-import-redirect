@@ -14,7 +14,7 @@ func TestRedirector_ServeHTTP(t *testing.T) {
 	r := &redirector{"src.example.com/x", "https://example.com/git", "git"}
 
 	t.Run("GoVisit", func(t *testing.T) {
-		req := httptest.NewRequest(http.MethodGet, "https://src.example.com/foo?go-get=1", nil)
+		req := httptest.NewRequest(http.MethodGet, "https://src.example.com/x/foo?go-get=1", nil)
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
 
@@ -28,7 +28,7 @@ func TestRedirector_ServeHTTP(t *testing.T) {
 			t.FailNow()
 		}
 		expected := `<!doctype html>
-<meta name="go-import" content="src.example.com/foo git https://example.com/git/src.example.com">
+<meta name="go-import" content="src.example.com/x/foo git https://example.com/git/foo">
 <title>go-import-redirect</title>
 `
 		if string(body) != expected {
@@ -40,7 +40,7 @@ func TestRedirector_ServeHTTP(t *testing.T) {
 	})
 
 	t.Run("UserVisit", func(t *testing.T) {
-		req := httptest.NewRequest(http.MethodGet, "https://src.example.com/foo", nil)
+		req := httptest.NewRequest(http.MethodGet, "https://src.example.com/x/foo", nil)
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
 
@@ -51,8 +51,8 @@ func TestRedirector_ServeHTTP(t *testing.T) {
 		if resp.ContentLength > 0 {
 			t.Error("expected empty body")
 		}
-		if hdr := resp.Header.Get("Location"); hdr != "https://pkg.go.dev/src.example.com/foo" {
-			t.Errorf("expected %q, got %q", "https://pkg.go.dev/src.example.com/foo", hdr)
+		if hdr := resp.Header.Get("Location"); hdr != "https://pkg.go.dev/src.example.com/x/foo" {
+			t.Errorf("expected %q, got %q", "https://pkg.go.dev/src.example.com/x/foo", hdr)
 		}
 	})
 }
