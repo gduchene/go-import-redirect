@@ -14,9 +14,8 @@ import (
 	"os"
 	"os/signal"
 	"regexp"
+	"syscall"
 	"time"
-
-	"golang.org/x/sys/unix"
 
 	"go.awhk.org/gosdd"
 )
@@ -32,7 +31,7 @@ func main() {
 	flag.Parse()
 
 	done := make(chan os.Signal, 1)
-	signal.Notify(done, os.Interrupt, unix.SIGTERM)
+	signal.Notify(done, os.Interrupt, syscall.SIGTERM)
 
 	srv := http.Server{Handler: &redirector{regexp.MustCompile(*from), *to, *vcs}}
 	go func() {
