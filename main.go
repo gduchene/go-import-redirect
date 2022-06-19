@@ -9,7 +9,6 @@ import (
 	"context"
 	"flag"
 	"log"
-	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -17,7 +16,7 @@ import (
 	"syscall"
 	"time"
 
-	"go.awhk.org/gosdd"
+	"go.awhk.org/core"
 )
 
 var (
@@ -35,15 +34,8 @@ func main() {
 
 	srv := http.Server{Handler: &redirector{regexp.MustCompile(*from), *to, *vcs}}
 	go func() {
-		ln, err := listenSD()
-		if err != nil {
-			log.Fatalln("listenSD:", err)
-		}
-		if ln == nil {
-			ln = listenFlag()
-		}
-		if err := srv.Serve(ln); err != nil && err != http.ErrServerClosed {
-			log.Fatalln("server.ListenAndServe:", err)
+		if err := srv.Serve(core.Must(core.Listen(*addr))); err != nil && err != http.ErrServerClosed {
+			log.Fatalln("server.Serve:", err)
 		}
 	}()
 
@@ -53,37 +45,4 @@ func main() {
 	if err := srv.Shutdown(ctx); err != nil && err != http.ErrServerClosed {
 		log.Fatalln("server.Shutdown:", err)
 	}
-}
-
-func listenFlag() net.Listener {
-	if (*addr)[0] != '/' {
-		ln, err := net.Listen("tcp", *addr)
-		if err != nil {
-			log.Fatalln("net.Listen:", err)
-		}
-		return ln
-	}
-	ln, err := net.Listen("unix", *addr)
-	if err != nil {
-		log.Fatalln("net.Listen:", err)
-	}
-	// We do not do any authorization anyway, so 0666 makes sense here.
-	if err = os.Chmod(*addr, 0666); err != nil {
-		log.Println("Failed to set permissions on UNIX socket:", err)
-	}
-	return ln
-}
-
-func listenSD() (net.Listener, error) {
-	fds, err := gosdd.SDListenFDs(true)
-	if err != nil {
-		if err == gosdd.ErrNoSDSupport {
-			return nil, nil
-		}
-		return nil, err
-	}
-	if len(fds) == 0 {
-		return nil, nil
-	}
-	return net.FileListener(fds[0])
 }
