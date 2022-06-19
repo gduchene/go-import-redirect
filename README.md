@@ -11,11 +11,15 @@ to https://godoc.org.
   It can either be a normal `IP:PORT` address or an absolute path to a
   UNIX socket that will be created. Defaults to `localhost:8080`. See
   https://golang.org/pkg/net/#Dial for more details.
-* `-from` for the prefix that must be removed from your package name,
-  e.g. `golang.org/x/` for `golang.org/x/image`.
+* `-from` for the regular expression that the import path must match,
+  including any capturing group, e.g. `go\\.example\\.com/(.+)`.
 * `-to` for the URL that will be used to build the repository URL.
+  Capturing groups can be used, e.g. `https://git.example.com/$1`.
 * `-vcs` for the type of VCS you are using, e.g. `git`. Defaults to
   `git`.
+
+Additionally, a configuration file can be passed with `-c`. See
+`archlinux/go-import-redirect.conf` for an example.
 
 It is recommended to enable the companion systemd socket and customize
 it so systemd can start the service when needed and pass the socket to
