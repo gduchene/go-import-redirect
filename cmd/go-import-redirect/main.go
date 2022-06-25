@@ -1,8 +1,6 @@
 // SPDX-FileCopyrightText: © 2019 Grégoire Duchêne <gduchene@awhk.org>
 // SPDX-License-Identifier: ISC
 
-//go:build !aws
-
 package main
 
 import (
