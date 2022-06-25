@@ -1,8 +1,8 @@
-FROM golang:1.17
+FROM golang:1.18
 WORKDIR /root
 COPY . ./
 ENV CGO_ENABLED=0
-RUN go build -tags nosystemd
+RUN go build ./cmd/go-import-redirect
 
 FROM scratch
 COPY --from=0 /root/go-import-redirect /go-import-redirect
